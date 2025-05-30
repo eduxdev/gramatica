@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Gramática Float</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tree-node {
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 4px;
+            display: inline-block;
+            font-family: monospace;
+        }
+        .node-production {
+            background-color: #e3f2fd;
+            border: 1px solid #90caf9;
+        }
+        .node-terminal {
+            background-color: #f3e5f5;
+            border: 1px solid #ce93d8;
+        }
+        .tree-container {
+            font-family: monospace;
+            white-space: pre;
+            line-height: 1.5;
+        }
+        .tree-line {
+            color: #666;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">Analizador de Gramática Float</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Ingrese la declaración de variable(s)</h2>
+            <input type="text" id="inputCode" 
+                   class="w-full p-3 border border-gray-300 rounded-lg mb-4" 
+                   placeholder="Ejemplo: float a = 1.2, b = 3.4, c = b;">
+            <button onclick="analizar()" 
+                    class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
+                Analizar
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Gramática Generada</h2>
+                <pre id="gramatica" class="bg-gray-50 p-4 rounded-lg text-sm"></pre>
+            </div>
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Árbol de Derivación</h2>
+                <div id="arbol" class="bg-gray-50 p-4 rounded-lg overflow-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
