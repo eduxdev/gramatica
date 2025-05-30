@@ -9,10 +9,54 @@ function esNumero(valor) {
     return !isNaN(valor) && /^-?\d*\.?\d+$/.test(valor);
 }
 
+function crearNodoGrafico(texto, esTerminal = false, hijos = []) {
+    const colorFondo = esTerminal ? '#f3e5f5' : '#e3f2fd';
+    const colorBorde = esTerminal ? '#ce93d8' : '#90caf9';
+    
+    const nodo = document.createElement('div');
+    nodo.className = 'nodo';
+    
+    const contenido = document.createElement('div');
+    contenido.className = 'nodo-contenido';
+    contenido.style.backgroundColor = colorFondo;
+    contenido.style.border = `2px solid ${colorBorde}`;
+    contenido.textContent = texto;
+    
+    nodo.appendChild(contenido);
+    
+    if (hijos.length > 0) {
+        const hijosContainer = document.createElement('div');
+        hijosContainer.className = 'nodo-hijos';
+        
+        // Crear líneas para conectar con los hijos
+        if (hijos.length >= 1) {
+            const lineaIzquierda = document.createElement('div');
+            lineaIzquierda.className = 'linea linea-izquierda';
+            nodo.appendChild(lineaIzquierda);
+        }
+        
+        if (hijos.length >= 2) {
+            const lineaDerecha = document.createElement('div');
+            lineaDerecha.className = 'linea linea-derecha';
+            nodo.appendChild(lineaDerecha);
+        }
+        
+        // Agregar los nodos hijos
+        hijos.forEach(hijo => {
+            hijosContainer.appendChild(hijo);
+        });
+        
+        nodo.appendChild(hijosContainer);
+    }
+    
+    return nodo;
+}
+
 function analizar() {
     const input = document.getElementById('inputCode').value.trim();
     const gramaticaDiv = document.getElementById('gramatica');
-    const arbolDiv = document.getElementById('arbol');
+    const arbolGraficoDiv = document.getElementById('arbol-grafico');
+    const formaAnalizadaDiv = document.getElementById('forma-analizada');
 
     // Limpiar espacios extras y normalizar
     const normalizedInput = input.replace(/\s+/g, ' ');
@@ -30,8 +74,8 @@ function analizar() {
     ];
 
     // Analizar el tipo de declaración
-    let arbolHTML = [];
     let explicacion = [];
+    let arbolGrafico = null;
 
     // Detectar el caso simple (float a;)
     const esCasoSimple = input.match(/^float\s+[a-zA-Z_]\w*\s*;$/);
@@ -42,16 +86,20 @@ function analizar() {
     if (esCasoSimple) {
         // Caso simple: float a;
         explicacion.push('float id;');
-        arbolHTML = [
-            crearNodo('S'),
-            '├─────┬─────┐',
-            `│     │     ${crearNodo('W')}`,
-            `│     │     └───${crearNodo('E')}`,
-            `│     │         └───${crearNodo(';', true)}`,
-            `│     ${crearNodo('Y')}`,
-            `│     ├───${crearNodo('float', true)}`,
-            `│     └───${crearNodo('id', true)}`
-        ];
+        
+        // Crear árbol gráfico
+        const nodoE = crearNodoGrafico('E', false, [
+            crearNodoGrafico(';', true)
+        ]);
+        
+        const nodoW = crearNodoGrafico('W', false, [nodoE]);
+        
+        const nodoB = crearNodoGrafico('id', true);
+        const nodoA = crearNodoGrafico('float', true);
+        const nodoY = crearNodoGrafico('Y', false, [nodoA, nodoB]);
+        
+        arbolGrafico = crearNodoGrafico('S', false, [nodoY, nodoW]);
+        
     } else if (esCasoMultipleSinAsignacion) {
         // Caso múltiple sin asignación: float a, b;
         const variables = input.substring(input.indexOf('float') + 5, input.indexOf(';')).split(',');
@@ -66,39 +114,31 @@ function analizar() {
         explicacionTexto += ';';
         explicacion.push(explicacionTexto);
         
-        // Construir árbol optimizado para múltiples variables
-        arbolHTML = [
-            crearNodo('S'),
-            '├─────┬─────┐',
-            `│     │     ${crearNodo('W')}`
-        ];
+        // Crear árbol gráfico para caso múltiple
+        const nodoE = crearNodoGrafico('E', false, [
+            crearNodoGrafico(';', true)
+        ]);
         
-        // Primera variable (después del float)
-        arbolHTML.push(`│     │     ├───${crearNodo('F')}`);
-        arbolHTML.push(`│     │     │   └───${crearNodo(',', true)}`);
+        // Construir W con las variables adicionales
+        let nodoW = crearNodoGrafico('W', false, [nodoE]);
         
-        // Generar nodos para las variables
-        let lastIndex = variables.length - 1;
-        for (let i = 1; i < variables.length; i++) {
-            arbolHTML.push(`│     │     └───${crearNodo('K')}`);
-            arbolHTML.push(`│     │         ├───${crearNodo('id', true)}`);
-            
-            if (i < lastIndex) {
-                arbolHTML.push(`│     │         └───${crearNodo('W')}`);
-                arbolHTML.push(`│     │             ├───${crearNodo('F')}`);
-                arbolHTML.push(`│     │             │   └───${crearNodo(',', true)}`);
-            } else {
-                // Última variable
-                arbolHTML.push(`│     │         └───${crearNodo('W')}`);
-                arbolHTML.push(`│     │             └───${crearNodo('E')}`);
-                arbolHTML.push(`│     │                 └───${crearNodo(';', true)}`);
+        if (variables.length > 1) {
+            for (let i = variables.length - 1; i > 0; i--) {
+                const nodoId = crearNodoGrafico('id', true);
+                const nodoK = crearNodoGrafico('K', false, [nodoId, nodoW]);
+                const nodoF = crearNodoGrafico('F', false, [
+                    crearNodoGrafico(',', true)
+                ]);
+                nodoW = crearNodoGrafico('W', false, [nodoF, nodoK]);
             }
         }
         
-        // Agregar la parte Y del árbol
-        arbolHTML.push(`│     ${crearNodo('Y')}`);
-        arbolHTML.push(`│     ├───${crearNodo('float', true)}`);
-        arbolHTML.push(`│     └───${crearNodo('id', true)}`);
+        const nodoB = crearNodoGrafico('id', true);
+        const nodoA = crearNodoGrafico('float', true);
+        const nodoY = crearNodoGrafico('Y', false, [nodoA, nodoB]);
+        
+        arbolGrafico = crearNodoGrafico('S', false, [nodoY, nodoW]);
+        
     } else {
         // Analizar la entrada para identificar todas las partes (casos complejos con asignación)
         const declaraciones = [];
@@ -140,57 +180,71 @@ function analizar() {
         explicacionTexto += ';';
         explicacion.push(explicacionTexto);
 
-        // Construir el árbol para casos complejos
-        arbolHTML = [
-            crearNodo('S'),
-            '├─────┬─────┐',
-            `│     │     ${crearNodo('W')}`
-        ];
-
-        // Construir el árbol para cada declaración
-        let lastWithValue = -1;
-        for (let i = 0; i < declaraciones.length; i++) {
-            if (declaraciones[i].valor) lastWithValue = i;
-        }
-
-        declaraciones.forEach((decl, index) => {
-            if (index > 0) {
-                arbolHTML.push(`│     │     ├───${crearNodo('F')}`);
-                arbolHTML.push(`│     │     │   └───${crearNodo(',', true)}`);
-                arbolHTML.push(`│     │     └───${crearNodo('K')}`);
-                arbolHTML.push(`│     │         ├───${crearNodo('id', true)}`);
-                arbolHTML.push(`│     │         └───${crearNodo('W')}`);
-            }
+        // Crear árbol gráfico para caso complejo
+        const nodoE = crearNodoGrafico('E', false, [
+            crearNodoGrafico(';', true)
+        ]);
+        
+        // Construir W con las declaraciones
+        let nodoW = crearNodoGrafico('W', false, [nodoE]);
+        
+        // Recorrer declaraciones en orden inverso para construir el árbol
+        for (let i = declaraciones.length - 1; i >= 0; i--) {
+            const decl = declaraciones[i];
             
             if (decl.valor) {
-                arbolHTML.push(`│     │     ├───${crearNodo('P')}`);
-                arbolHTML.push(`│     │     │   └───${crearNodo('=', true)}`);
-                arbolHTML.push(`│     │     ├───${crearNodo('B')}`);
-                arbolHTML.push(`│     │     │   └───${crearNodo(decl.esNumero ? 'num' : 'id', true)}`);
+                // Si hay valor, agregar nodos P y B
+                const nodoB = crearNodoGrafico('B', false, [
+                    crearNodoGrafico(decl.esNumero ? 'num' : 'id', true)
+                ]);
                 
-                // Solo agregar W intermedio si no es la última asignación
-                if (index < lastWithValue) {
-                    arbolHTML.push(`│     │     └───${crearNodo('W')}`);
+                const nodoP = crearNodoGrafico('P', false, [
+                    crearNodoGrafico('=', true)
+                ]);
+                
+                if (i > 0) {
+                    // Si no es la primera declaración, agregar nodos K y F
+                    const nodoK = crearNodoGrafico('K', false, [
+                        crearNodoGrafico('id', true),
+                        nodoW
+                    ]);
+                    
+                    const nodoF = crearNodoGrafico('F', false, [
+                        crearNodoGrafico(',', true)
+                    ]);
+                    
+                    nodoW = crearNodoGrafico('W', false, [nodoP, nodoB, nodoW]);
+                } else {
+                    // Si es la primera declaración
+                    nodoW = crearNodoGrafico('W', false, [nodoP, nodoB, nodoW]);
                 }
+            } else if (i > 0) {
+                // Si no hay valor pero no es la primera declaración
+                const nodoK = crearNodoGrafico('K', false, [
+                    crearNodoGrafico('id', true),
+                    nodoW
+                ]);
+                
+                const nodoF = crearNodoGrafico('F', false, [
+                    crearNodoGrafico(',', true)
+                ]);
+                
+                nodoW = crearNodoGrafico('W', false, [nodoF, nodoK]);
             }
-        });
-
-        // Agregar el punto y coma final directamente después de la última asignación
-        // o después de la última variable sin asignación
-        if (lastWithValue >= 0) {
-            arbolHTML.push(`│     │     └───${crearNodo('W')}`);
         }
-        arbolHTML.push(`│     │         └───${crearNodo('E')}`);
-        arbolHTML.push(`│     │             └───${crearNodo(';', true)}`);
         
-        // Agregar la parte Y del árbol
-        arbolHTML.push(`│     ${crearNodo('Y')}`);
-        arbolHTML.push(`│     ├───${crearNodo('float', true)}`);
-        arbolHTML.push(`│     └───${crearNodo('id', true)}`);
+        const nodoB = crearNodoGrafico('id', true);
+        const nodoA = crearNodoGrafico('float', true);
+        const nodoY = crearNodoGrafico('Y', false, [nodoA, nodoB]);
+        
+        arbolGrafico = crearNodoGrafico('S', false, [nodoY, nodoW]);
     }
 
     // Mostrar resultados
     gramaticaDiv.innerHTML = gramatica.join('\n');
-    arbolDiv.innerHTML = `<div class="tree-container">${arbolHTML.join('\n')}</div>
-                         <p class="mt-4 text-gray-600">Forma analizada: ${explicacion.join('\n')}</p>`;
+    formaAnalizadaDiv.innerHTML = `<p class="text-gray-600">${explicacion.join('\n')}</p>`;
+    
+    // Mostrar árbol gráfico
+    arbolGraficoDiv.innerHTML = '';
+    arbolGraficoDiv.appendChild(arbolGrafico);
 } 

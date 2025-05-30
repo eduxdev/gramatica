@@ -29,6 +29,57 @@
         .tree-line {
             color: #666;
         }
+        
+        /* Estilos para el árbol gráfico */
+        .arbol-grafico {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .nodo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .nodo-contenido {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            z-index: 2;
+        }
+        
+        .nodo-hijos {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        .linea {
+            position: absolute;
+            border-top: 2px solid #666;
+            top: 20px;
+            width: 30px;
+            z-index: 1;
+        }
+        
+        .linea-izquierda {
+            right: 50%;
+            transform: rotate(-45deg);
+            transform-origin: right;
+        }
+        
+        .linea-derecha {
+            left: 50%;
+            transform: rotate(45deg);
+            transform-origin: left;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-8">
@@ -46,14 +97,21 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-xl font-semibold mb-4">Gramática Generada</h2>
-                <pre id="gramatica" class="bg-gray-50 p-4 rounded-lg text-sm"></pre>
-            </div>
+        <div class="grid grid-cols-1 gap-6">
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-xl font-semibold mb-4">Árbol de Derivación</h2>
-                <div id="arbol" class="bg-gray-50 p-4 rounded-lg overflow-auto"></div>
+                <div id="arbol-grafico" class="bg-gray-50 p-4 rounded-lg overflow-auto"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4">Gramática Generada</h2>
+                    <pre id="gramatica" class="bg-gray-50 p-4 rounded-lg text-sm"></pre>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4">Forma Analizada</h2>
+                    <div id="forma-analizada" class="bg-gray-50 p-4 rounded-lg"></div>
+                </div>
             </div>
         </div>
     </div>
