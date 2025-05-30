@@ -28,17 +28,25 @@ function crearNodoGrafico(texto, esTerminal = false, hijos = []) {
         const hijosContainer = document.createElement('div');
         hijosContainer.className = 'nodo-hijos';
         
-        // Crear líneas para conectar con los hijos
-        if (hijos.length >= 1) {
-            const lineaIzquierda = document.createElement('div');
-            lineaIzquierda.className = 'linea linea-izquierda';
-            nodo.appendChild(lineaIzquierda);
-        }
+        // Crear línea vertical para conectar con los hijos
+        const lineaVertical = document.createElement('div');
+        lineaVertical.className = 'linea linea-vertical';
+        nodo.appendChild(lineaVertical);
         
-        if (hijos.length >= 2) {
-            const lineaDerecha = document.createElement('div');
-            lineaDerecha.className = 'linea linea-derecha';
-            nodo.appendChild(lineaDerecha);
+        // Crear líneas diagonales solo si hay más de un hijo
+        if (hijos.length > 1) {
+            // Si hay más de un hijo, crear líneas diagonales
+            if (hijos.length >= 2) {
+                const lineaIzquierda = document.createElement('div');
+                lineaIzquierda.className = 'linea linea-izquierda';
+                nodo.appendChild(lineaIzquierda);
+            }
+            
+            if (hijos.length >= 3) {
+                const lineaDerecha = document.createElement('div');
+                lineaDerecha.className = 'linea linea-derecha';
+                nodo.appendChild(lineaDerecha);
+            }
         }
         
         // Agregar los nodos hijos
@@ -94,9 +102,9 @@ function analizar() {
         
         const nodoW = crearNodoGrafico('W', false, [nodoE]);
         
-        const nodoB = crearNodoGrafico('id', true);
-        const nodoA = crearNodoGrafico('float', true);
-        const nodoY = crearNodoGrafico('Y', false, [nodoA, nodoB]);
+        const nodoId = crearNodoGrafico('id', true);
+        const nodoFloat = crearNodoGrafico('float', true);
+        const nodoY = crearNodoGrafico('Y', false, [nodoFloat, nodoId]);
         
         arbolGrafico = crearNodoGrafico('S', false, [nodoY, nodoW]);
         
@@ -133,9 +141,9 @@ function analizar() {
             }
         }
         
-        const nodoB = crearNodoGrafico('id', true);
-        const nodoA = crearNodoGrafico('float', true);
-        const nodoY = crearNodoGrafico('Y', false, [nodoA, nodoB]);
+        const nodoId = crearNodoGrafico('id', true);
+        const nodoFloat = crearNodoGrafico('float', true);
+        const nodoY = crearNodoGrafico('Y', false, [nodoFloat, nodoId]);
         
         arbolGrafico = crearNodoGrafico('S', false, [nodoY, nodoW]);
         
@@ -213,6 +221,7 @@ function analizar() {
                         crearNodoGrafico(',', true)
                     ]);
                     
+                    // Crear el nodo W con 3 hijos: P, B y W
                     nodoW = crearNodoGrafico('W', false, [nodoP, nodoB, nodoW]);
                 } else {
                     // Si es la primera declaración
@@ -233,9 +242,9 @@ function analizar() {
             }
         }
         
-        const nodoB = crearNodoGrafico('id', true);
-        const nodoA = crearNodoGrafico('float', true);
-        const nodoY = crearNodoGrafico('Y', false, [nodoA, nodoB]);
+        const nodoId = crearNodoGrafico('id', true);
+        const nodoFloat = crearNodoGrafico('float', true);
+        const nodoY = crearNodoGrafico('Y', false, [nodoFloat, nodoId]);
         
         arbolGrafico = crearNodoGrafico('S', false, [nodoY, nodoW]);
     }
