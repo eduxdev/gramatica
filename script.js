@@ -130,7 +130,9 @@ function analizar() {
     // Gramática con símbolos terminales separados
     let gramatica = [
         'S -> Y W',
-        'Y -> float id',
+        'Y -> M N',
+        'M -> float',
+        'N -> id',
         'W -> P B W | F K | E',
         'P -> =',
         'F -> ,',
@@ -177,14 +179,18 @@ function analizar() {
         });
         
         // Construir el árbol desde la raíz
-        // Crear nodo S (raíz)
-        const nodoS = crearNodoGrafico('S', false);
         
-        // Crear nodo Y (float id)
-        const nodoY = crearNodoGrafico('Y', false, [
-            crearNodoGrafico('float', true),
+        // Crear nodos M y N
+        const nodoM = crearNodoGrafico('M', false, [
+            crearNodoGrafico('float', true)
+        ]);
+        
+        const nodoN = crearNodoGrafico('N', false, [
             crearNodoGrafico('id', true)
         ]);
+        
+        // Crear nodo Y (M N)
+        const nodoY = crearNodoGrafico('Y', false, [nodoM, nodoN]);
         
         // Construir el árbol W recursivamente de atrás hacia adelante
         let ultimoNodoW;
