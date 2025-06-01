@@ -35,6 +35,9 @@
             display: flex;
             justify-content: center;
             margin-top: 20px;
+            overflow-x: auto;
+            min-height: 600px;
+            padding: 30px;
         }
         
         .nodo {
@@ -42,26 +45,40 @@
             flex-direction: column;
             align-items: center;
             position: relative;
-            margin-top: 20px;
+            margin-top: 30px;
+            min-width: 50px;
         }
         
         .nodo-contenido {
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 40px;
-            height: 40px;
+            min-width: 45px;
+            height: 45px;
             border-radius: 50%;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             z-index: 2;
+            padding: 0 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
         }
         
         .nodo-hijos {
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 50px;
             position: relative;
-            margin-top: 10px;
+            margin-top: 20px;
+        }
+        
+        .lineas-container {
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            top: 45px;
+            left: 0;
+            z-index: 1;
         }
         
         .linea {
@@ -70,35 +87,19 @@
             z-index: 1;
         }
         
-        .linea-izquierda {
-            right: 55%;
-            transform: rotate(-30deg);
-            transform-origin: right;
-            top: 20px;
-            width: 40px;
-        }
-        
-        .linea-derecha {
-            left: 55%;
-            transform: rotate(30deg);
-            transform-origin: left;
-            top: 20px;
-            width: 40px;
-        }
-        
         .linea-vertical {
             border-top: none;
             border-left: 2px solid #666;
-            height: 30px;
+            height: 40px;
             width: 0;
-            top: 40px;
+            top: 0;
             left: 50%;
             transform: translateX(-50%);
         }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-8">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-6xl mx-auto">
         <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">Analizador de Gramática Float</h1>
         
         <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
